@@ -2,7 +2,7 @@
 session_start();
 
 if (!isset($_SESSION['username'])) {
-    header('Location: login/login.html');
+    header('Location: ../login/login.php');
     exit;
 }
 
@@ -25,7 +25,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     // Leggi il file JSON
-    $file = 'data/persone.json';
+    $file = '../data/persone.json';
     $persone = [];
 
     if (file_exists($file)) {
@@ -64,6 +64,5 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     exit;
 }
 
-header('Location: dashboard.php');
+header('Location: ../dashboard.php');
 exit;
-
