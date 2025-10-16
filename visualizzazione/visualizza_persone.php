@@ -20,6 +20,26 @@ if (file_exists($file)) {
 }
 
 // Gestione filtri
+$filtro_cognome = isset($_GET['cognome']) ? trim($_GET['cognome']) : '';
+$filtro_data_dopo = isset($_GET['data_dopo']) ? trim($_GET['data_dopo']) : '';
+
+// Applica filtri
+$persone_filtrate = $persone;
+if (!empty($filtro_cognome) || !empty($filtro_data_dopo)) {
+    $persone_filtrate = array_filter($persone, function($persona) use ($filtro_cognome, $filtro_data_dopo) {
+        $match = true;
+
+        if (!empty($filtro_cognome)) {
+            $match = $match && stripos($persona['cognome'], $filtro_cognome) !== false;
+        }
+
+        if (!empty($filtro_data_dopo)) {
+            $match = $match && strtotime($persona['data_nascita']) > strtotime($filtro_data_dopo);
+        }
+
+        return $match;
+    });
+}
 
 ?>
 <!DOCTYPE html>
@@ -37,9 +57,9 @@ if (file_exists($file)) {
         <div class="filtri">
             <h3>Filtri di Ricerca</h3>
             <form method="GET" class="form-filtri">
-                <input type="text" name="nome" placeholder="Nome" value="<?php echo htmlspecialchars($filtro_nome); ?>">
                 <input type="text" name="cognome" placeholder="Cognome" value="<?php echo htmlspecialchars($filtro_cognome); ?>">
-                <input type="text" name="codice_fiscale" placeholder="Codice Fiscale" value="<?php echo htmlspecialchars($filtro_cf); ?>">
+                <label for="data_dopo">Nati dopo il:</label>
+                <input type="date" name="data_dopo" id="data_dopo" value="<?php echo htmlspecialchars($filtro_data_dopo); ?>">
                 <button type="submit">Cerca</button>
                 <a href="visualizza_persone.php" class="btn-reset">Reset</a>
             </form>
