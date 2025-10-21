@@ -1,29 +1,21 @@
 <?php
-session_start();
+require_once '../config.php';
+
+inizializza_sessione();
 
 $error = '';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $username = $_POST['username'];
+    $username = trim($_POST['username']);
     $password = $_POST['password'];
 
-    // Leggi il file JSON degli utenti
-    $usersFile = '../data/users.json';
-
-    if (!file_exists($usersFile)) {
-        $error = "Nessun utente registrato.";
+    if (empty($username) || empty($password)) {
+        $error = "Tutti i campi sono obbligatori.";
+    } elseif (verifica_credenziali($username, $password)) {
+        $_SESSION['username'] = $username;
+        header('Location: ../dashboard.php');
+        exit;
     } else {
-        $jsonData = file_get_contents($usersFile);
-        $users = json_decode($jsonData, true);
-
-        // Cerca la corrispondenza
-        foreach ($users as $user) {
-            if ($user['username'] === $username && password_verify($password, $user['password'])) {
-                $_SESSION['username'] = $username;
-                header('Location: ../dashboard.php');
-                exit;
-            }
-        }
         $error = "Credenziali non valide.";
     }
 }

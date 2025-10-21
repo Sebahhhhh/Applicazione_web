@@ -1,51 +1,25 @@
 <?php
+require_once '../config.php';
+
 $error = '';
 $success = '';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $username = $_POST['username'];
+    $username = trim($_POST['username']);
     $password = $_POST['password'];
     $confirmPassword = $_POST['confirm_password'];
 
-    // Validazione semplice
     if (empty($username) || empty($password) || empty($confirmPassword)) {
         $error = 'Tutti i campi sono obbligatori.';
     } elseif ($password !== $confirmPassword) {
         $error = 'Le password non corrispondono.';
+    } elseif (username_esiste($username)) {
+        $error = 'Nome utente già preso.';
     } else {
-        // Salva l'utente nel file JSON
-        $usersFile = '../data/users.json';
-
-        if (!file_exists($usersFile)) {
-            $users = [];
-        } else {
-            $jsonData = file_get_contents($usersFile);
-            $users = json_decode($jsonData, true);
-        }
-
-        // Controlla se l'utente esiste già
-        $userExists = false;
-        foreach ($users as $user) {
-            if ($user['username'] === $username) {
-                $userExists = true;
-                break;
-            }
-        }
-
-        if ($userExists) {
-            $error = 'Nome utente già preso.';
-        } else {
-            // Aggiungi il nuovo utente
-            $newUser = [
-                'username' => $username,
-                'password' => password_hash($password, PASSWORD_DEFAULT)
-            ];
-            $users[] = $newUser;
-
-            // Salva di nuovo nel file JSON
-            file_put_contents($usersFile, json_encode($users));
-
+        if (aggiungi_utente($username, $password)) {
             $success = 'Registrazione avvenuta con successo. Puoi ora effettuare il login.';
+        } else {
+            $error = 'Errore durante la registrazione.';
         }
     }
 }

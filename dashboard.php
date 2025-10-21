@@ -1,10 +1,6 @@
 <?php
-session_start();
-
-if (!isset($_SESSION['username'])) {
-    header('Location: login/login.php');
-    exit;
-}
+require_once 'config.php';
+verifica_autenticazione();
 ?>
 <!DOCTYPE html>
 <html lang="it">

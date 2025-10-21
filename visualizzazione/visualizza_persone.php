@@ -1,46 +1,12 @@
 <?php
-session_start();
+require_once '../config.php';
+verifica_autenticazione();
 
-if (!isset($_SESSION['username'])) {
-    header('Location: ../login/login.php');
-    exit;
-}
-
-// Leggi il file JSON
-$file = '../data/persone.json';
-$persone = [];
-
-if (file_exists($file)) {
-    $json_data = file_get_contents($file);
-    $persone = json_decode($json_data, true);
-
-    if ($persone === null) {
-        $persone = [];
-    }
-}
-
-// Gestione filtri
 $filtro_cognome = isset($_GET['cognome']) ? trim($_GET['cognome']) : '';
 $filtro_data_dopo = isset($_GET['data_dopo']) ? trim($_GET['data_dopo']) : '';
 
-// Applica filtri
-$persone_filtrate = $persone;
-if (!empty($filtro_cognome) || !empty($filtro_data_dopo)) {
-    $persone_filtrate = array_filter($persone, function($persona) use ($filtro_cognome, $filtro_data_dopo) {
-        $match = true;
-
-        if (!empty($filtro_cognome)) {
-            $match = $match && stripos($persona['cognome'], $filtro_cognome) !== false;
-        }
-
-        if (!empty($filtro_data_dopo)) {
-            $match = $match && strtotime($persona['data_nascita']) > strtotime($filtro_data_dopo);
-        }
-
-        return $match;
-    });
-}
-
+$persone_filtrate = ottieni_persone($filtro_cognome, $filtro_data_dopo);
+$tutte_persone = leggi_json(PERSONE_FILE);
 ?>
 <!DOCTYPE html>
 <html lang="it">
@@ -83,12 +49,12 @@ if (!empty($filtro_cognome) || !empty($filtro_data_dopo)) {
                             <td><?php echo htmlspecialchars($persona['codice_fiscale']); ?></td>
                             <td><?php echo htmlspecialchars($persona['nome']); ?></td>
                             <td><?php echo htmlspecialchars($persona['cognome']); ?></td>
-                            <td><?php echo htmlspecialchars(date('d/m/Y', strtotime($persona['data_nascita']))); ?></td>
+                            <td><?php echo formatta_data($persona['data_nascita']); ?></td>
                         </tr>
                     <?php endforeach; ?>
                 </tbody>
             </table>
-            <p class="totale">Totale persone visualizzate: <?php echo count($persone_filtrate); ?> / <?php echo count($persone); ?></p>
+            <p class="totale">Totale persone visualizzate: <?php echo count($persone_filtrate); ?> / <?php echo count($tutte_persone); ?></p>
         <?php endif; ?>
 
         <a href="../dashboard.php" class="back-link">Torna alla Dashboard</a>

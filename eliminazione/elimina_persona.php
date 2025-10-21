@@ -1,55 +1,27 @@
 <?php
-session_start();
-
-if (!isset($_SESSION['username'])) {
-    header('Location: ../login/login.php');
-    exit;
-}
+require_once '../config.php';
+verifica_autenticazione();
 
 $messaggio = '';
 $tipo_messaggio = '';
 
-// Leggi il file JSON
-$file = '../data/persone.json';
-$persone = [];
+$persone = leggi_json(PERSONE_FILE);
 
-if (file_exists($file)) {
-    $json_data = file_get_contents($file);
-    $persone = json_decode($json_data, true);
-
-    if ($persone === null) {
-        $persone = [];
-    }
-}
-
-// Gestione eliminazione
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['elimina'])) {
     $codice_fiscale = strtoupper(trim($_POST['codice_fiscale']));
 
-    $trovato = false;
-    $persone_aggiornate = [];
-
-    foreach ($persone as $persona) {
-        if ($persona['codice_fiscale'] === $codice_fiscale) {
-            $trovato = true;
+    if (codice_fiscale_esiste($codice_fiscale)) {
+        if (elimina_persona($codice_fiscale)) {
             $messaggio = "Persona con codice fiscale $codice_fiscale eliminata con successo!";
             $tipo_messaggio = 'success';
-        } else {
-            $persone_aggiornate[] = $persona;
-        }
-    }
-
-    if (!$trovato) {
-        $messaggio = "Nessuna persona trovata con il codice fiscale: $codice_fiscale";
-        $tipo_messaggio = 'error';
-    } else {
-        // Salva nel file JSON
-        if (file_put_contents($file, json_encode($persone_aggiornate, JSON_PRETTY_PRINT))) {
-            $persone = $persone_aggiornate;
+            $persone = leggi_json(PERSONE_FILE);
         } else {
             $messaggio = "Errore nel salvataggio del file";
             $tipo_messaggio = 'error';
         }
+    } else {
+        $messaggio = "Nessuna persona trovata con il codice fiscale: $codice_fiscale";
+        $tipo_messaggio = 'error';
     }
 }
 ?>
@@ -93,7 +65,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['elimina'])) {
                         <td><?php echo htmlspecialchars($persona['codice_fiscale']); ?></td>
                         <td><?php echo htmlspecialchars($persona['nome']); ?></td>
                         <td><?php echo htmlspecialchars($persona['cognome']); ?></td>
-                        <td><?php echo htmlspecialchars(date('d/m/Y', strtotime($persona['data_nascita']))); ?></td>
+                        <td><?php echo formatta_data($persona['data_nascita']); ?></td>
                     </tr>
                 <?php endforeach; ?>
             </table>
@@ -104,4 +76,3 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['elimina'])) {
     </div>
 </body>
 </html>
-
