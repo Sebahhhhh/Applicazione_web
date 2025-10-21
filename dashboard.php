@@ -23,6 +23,7 @@ if (!isset($_SESSION['username'])) {
             <ul>
                 <li><a href="inserimento/aggiungi_persona.php">Aggiungi Persona</a></li>
                 <li><a href="visualizzazione/visualizza_persone.php">Visualizza Persone</a></li>
+                <li><a href="eliminazione/elimina_persona.php">Elimina Persona</a></li>
             </ul>
         </nav>
     </div>
