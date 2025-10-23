@@ -1,17 +1,18 @@
 <?php
 
-// Configurazione percorsi file
+// configurazione percorsi file
 define('USERS_FILE', __DIR__ . '/data/users.json');
 define('PERSONE_FILE', __DIR__ . '/data/persone.json');
 
-// Configurazione sessione
+
+// verifica che la sessione sia avviata, utile per autenticazione e gestione utente
 function inizializza_sessione() {
     if (session_status() === PHP_SESSION_NONE) {
         session_start();
     }
 }
 
-// Verifica autenticazione
+// verifica che l'utente sia autenticato, altrimenti lo reindirizza al login
 function verifica_autenticazione() {
     inizializza_sessione();
     if (!isset($_SESSION['username'])) {
@@ -20,14 +21,14 @@ function verifica_autenticazione() {
     }
 }
 
-// Ottieni il percorso base relativo
+// calcola il percorso base relativo per i redirect e gli include
 function get_base_path() {
     $current_path = $_SERVER['PHP_SELF'];
     $depth = substr_count(dirname($current_path), '/') - substr_count('/5ID-Rocchi/Progetto', '/');
     return str_repeat('../', max(0, $depth));
 }
 
-// Leggi file JSON e restituisci array
+// legge il file json e lo converte in array associativo
 function leggi_json($file_path) {
     if (!file_exists($file_path)) {
         return [];
@@ -39,7 +40,7 @@ function leggi_json($file_path) {
     return ($data === null) ? [] : $data;
 }
 
-// Scrivi array in file JSON
+// salva l'array associativo nel file json, crea la cartella se non esiste
 function scrivi_json($file_path, $data) {
     $dir = dirname($file_path);
     if (!file_exists($dir)) {
@@ -49,13 +50,13 @@ function scrivi_json($file_path, $data) {
     return file_put_contents($file_path, json_encode($data, JSON_PRETTY_PRINT));
 }
 
-// Valida codice fiscale
+// controlla che il codice fiscale abbia il formato corretto
 function valida_codice_fiscale($codice_fiscale) {
     $pattern = '/^[A-Z]{6}[0-9]{2}[A-Z][0-9]{2}[A-Z][0-9]{3}[A-Z]$/';
     return preg_match($pattern, $codice_fiscale);
 }
 
-// Verifica se codice fiscale esiste già
+// verifica se il codice fiscale è già presente nel file delle persone
 function codice_fiscale_esiste($codice_fiscale) {
     $persone = leggi_json(PERSONE_FILE);
     foreach ($persone as $persona) {
@@ -66,7 +67,7 @@ function codice_fiscale_esiste($codice_fiscale) {
     return false;
 }
 
-// Verifica se username esiste già
+// verifica se lo username è già presente nel file degli utenti
 function username_esiste($username) {
     $users = leggi_json(USERS_FILE);
     foreach ($users as $user) {
@@ -77,7 +78,7 @@ function username_esiste($username) {
     return false;
 }
 
-// Verifica credenziali utente
+// verifica che username e password corrispondano a un utente registrato
 function verifica_credenziali($username, $password) {
     $users = leggi_json(USERS_FILE);
     foreach ($users as $user) {
@@ -88,7 +89,7 @@ function verifica_credenziali($username, $password) {
     return false;
 }
 
-// Aggiungi nuovo utente
+// aggiunge un nuovo utente al file json degli utenti
 function aggiungi_utente($username, $password) {
     $users = leggi_json(USERS_FILE);
     $users[] = [
@@ -98,7 +99,7 @@ function aggiungi_utente($username, $password) {
     return scrivi_json(USERS_FILE, $users);
 }
 
-// Aggiungi nuova persona
+// aggiunge una nuova persona al file json delle persone
 function aggiungi_persona($codice_fiscale, $nome, $cognome, $data_nascita) {
     $persone = leggi_json(PERSONE_FILE);
     $persone[] = [
@@ -110,20 +111,20 @@ function aggiungi_persona($codice_fiscale, $nome, $cognome, $data_nascita) {
     return scrivi_json(PERSONE_FILE, $persone);
 }
 
-// Elimina persona per codice fiscale
+// elimina una persona dal file json tramite codice fiscale
 function elimina_persona($codice_fiscale) {
     $persone = leggi_json(PERSONE_FILE);
     $persone_aggiornate = array_filter($persone, function($persona) use ($codice_fiscale) {
         return $persona['codice_fiscale'] !== $codice_fiscale;
     });
 
-    // Reindex array
+    // reindicizza l'array dopo la rimozione
     $persone_aggiornate = array_values($persone_aggiornate);
 
     return scrivi_json(PERSONE_FILE, $persone_aggiornate);
 }
 
-// Ottieni tutte le persone con filtri opzionali
+// filtra le persone per cognome e/o data di nascita
 function ottieni_persone($filtro_cognome = '', $filtro_data_dopo = '') {
     $persone = leggi_json(PERSONE_FILE);
 
@@ -134,10 +135,12 @@ function ottieni_persone($filtro_cognome = '', $filtro_data_dopo = '') {
     return array_filter($persone, function($persona) use ($filtro_cognome, $filtro_data_dopo) {
         $match = true;
 
+        // filtra per cognome se richiesto
         if (!empty($filtro_cognome)) {
             $match = $match && stripos($persona['cognome'], $filtro_cognome) !== false;
         }
 
+        // filtra per data di nascita se richiesto
         if (!empty($filtro_data_dopo)) {
             $match = $match && strtotime($persona['data_nascita']) > strtotime($filtro_data_dopo);
         }
@@ -146,10 +149,9 @@ function ottieni_persone($filtro_cognome = '', $filtro_data_dopo = '') {
     });
 }
 
-// Formatta data in formato italiano
+// formatta la data in formato italiano gg/mm/aaaa
 function formatta_data($data) {
     return date('d/m/Y', strtotime($data));
 }
 
 ?>
-

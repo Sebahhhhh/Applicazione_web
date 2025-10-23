@@ -1,11 +1,15 @@
 <?php
 require_once '../config.php';
+// verifica che l'utente sia autenticato prima di mostrare la pagina
 verifica_autenticazione();
 
+// prende i filtri dal form GET
 $filtro_cognome = isset($_GET['cognome']) ? trim($_GET['cognome']) : '';
 $filtro_data_dopo = isset($_GET['data_dopo']) ? trim($_GET['data_dopo']) : '';
 
+// ottiene le persone filtrate in base ai parametri
 $persone_filtrate = ottieni_persone($filtro_cognome, $filtro_data_dopo);
+// carica tutte le persone dal file json per il conteggio totale
 $tutte_persone = leggi_json(PERSONE_FILE);
 ?>
 <!DOCTYPE html>

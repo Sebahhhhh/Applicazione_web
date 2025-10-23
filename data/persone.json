@@ -4,5 +4,11 @@
         "nome": "Fabbrizzione",
         "cognome": "Pennetta",
         "data_nascita": "1111-11-11"
+    },
+    {
+        "codice_fiscale": "RSSMRA80A01H501U",
+        "nome": "Marco",
+        "cognome": "Zuppolino",
+        "data_nascita": "2025-10-24"
     }
 ]
