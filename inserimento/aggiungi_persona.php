@@ -9,7 +9,7 @@ $tipo_messaggio = '';
 
 // gestisce la richiesta di inserimento persona
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    // prende e normalizza i dati dal form
+    // prende e successivamente normalizza i dati dal form
     $codice_fiscale = strtoupper(trim($_POST['codice_fiscale']));
     $nome = trim($_POST['nome']);
     $cognome = trim($_POST['cognome']);

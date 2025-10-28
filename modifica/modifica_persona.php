@@ -11,7 +11,7 @@ $persona_trovata = null;
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['cerca'])) {
     // prende il codice fiscale dal form e lo normalizza
     $codice_fiscale = strtoupper(trim($_POST['codice_fiscale']));
-    // carica tutte le persone dal file json
+    // carica tutte le persone dal file JSON
     $persone = leggi_json(PERSONE_FILE);
     foreach ($persone as $p) {
         if ($p['codice_fiscale'] === $codice_fiscale) {

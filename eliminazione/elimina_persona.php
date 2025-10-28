@@ -7,7 +7,7 @@ verifica_autenticazione();
 $messaggio = '';
 $tipo_messaggio = '';
 
-// carica tutte le persone dal file json
+// carica tutte le persone dal file JSON
 $persone = leggi_json(PERSONE_FILE);
 
 // gestisce la richiesta di eliminazione

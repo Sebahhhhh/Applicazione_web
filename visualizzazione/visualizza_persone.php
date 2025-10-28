@@ -9,7 +9,7 @@ $filtro_data_dopo = isset($_GET['data_dopo']) ? trim($_GET['data_dopo']) : '';
 
 // ottiene le persone filtrate in base ai parametri
 $persone_filtrate = ottieni_persone($filtro_cognome, $filtro_data_dopo);
-// carica tutte le persone dal file json per il conteggio totale
+// carica tutte le persone dal file JSON per il conteggio totale
 $tutte_persone = leggi_json(PERSONE_FILE);
 ?>
 <!DOCTYPE html>

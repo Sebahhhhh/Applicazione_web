@@ -5,7 +5,7 @@ define('USERS_FILE', __DIR__ . '/data/users.json');
 define('PERSONE_FILE', __DIR__ . '/data/persone.json');
 
 
-// verifica che la sessione sia avviata, utile per autenticazione e gestione utente
+// verifica che la sessione sia avviata, utile per autenticazione e gestione utenti
 function inizializza_sessione() {
     if (session_status() === PHP_SESSION_NONE) {
         session_start();

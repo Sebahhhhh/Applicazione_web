@@ -19,7 +19,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if (aggiungi_utente($username, $password)) {
             $success = 'Registrazione avvenuta con successo. Puoi ora effettuare il login.';
         } else {
-            $error = 'Errore durante la registrazione.';
+            $error = 'Errore durante la registrazione!';
         }
     }
 }
